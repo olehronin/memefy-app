@@ -1,11 +1,11 @@
 import { ReactElement } from "react";
 import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/react";
 
-import { Meme } from "@/types/meme.ts";
+import { MemeData } from "@/types/memeData.ts";
 
 type EditorModalProps = {
-    editingMeme: Meme;
-    setEditingMeme: (meme: Meme) => void;
+    editingMeme: MemeData;
+    setEditingMeme: (meme: MemeData) => void;
     isOpen: boolean;
     onClose: () => void;
     handleSave: () => void;
