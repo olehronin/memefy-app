@@ -1,8 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 
 import IndexPage from "@/pages/index";
-import ListPage from "@/pages/listPage.tsx";
-import TablePage from "@/pages/tablePage.tsx";
+import ListPage from "@/pages/ListPage.tsx";
+import TablePage from "@/pages/TablePage.tsx";
 
 function App() {
     return (

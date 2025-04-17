@@ -10,7 +10,22 @@ export default {
         "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}"
     ],
     theme: {
-        extend: {}
+        extend: {
+            animation: {
+                "count-up": "countUp 0.4s ease-out forwards",
+                "count-down": "countDown 0.4s ease-out forwards",
+            },
+            keyframes: {
+                countUp: {
+                    "0%": { transform: "translateY(10px)", opacity: "0", filter: "blur(6px)" },
+                    "100%": { transform: "translateY(0)", opacity: "1", filter: "blur(0)" },
+                },
+                countDown: {
+                    "0%": { transform: "translateY(-10px)", opacity: "0", filter: "blur(6px)" },
+                    "100%": { transform: "translateY(0)", opacity: "1", filter: "blur(0)" },
+                },
+            },
+        },
     },
     darkMode: "class",
     plugins: [
