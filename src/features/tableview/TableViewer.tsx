@@ -1,6 +1,6 @@
 import { ReactElement, useMemo } from "react";
 import { Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
-import { ColumnConfig } from "@/components/tableComponents/ColumnConfig.tsx";
+import { ColumnConfig } from "@/features/tableview/ColumnConfig.tsx";
 
 interface TableViewerProps<T> {
     data: T[];

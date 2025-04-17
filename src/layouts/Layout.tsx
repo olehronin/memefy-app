@@ -1,8 +1,11 @@
-import { ReactNode } from "react";
+import { FC, memo, ReactElement, ReactNode } from "react";
+import Navbar from "@/components/Navbar.tsx";
 
-import { Navbar } from "@/components/navbar";
+type LayoutProps = {
+    children: ReactNode;
+}
 
-export default function DefaultLayout({ children }: { children: ReactNode }) {
+const Layout: FC<LayoutProps> = memo(({ children }): ReactElement => {
     return (
         <div className="relative flex flex-col h-screen">
             <Navbar />
@@ -20,4 +23,8 @@ export default function DefaultLayout({ children }: { children: ReactNode }) {
             </footer>
         </div>
     );
-}
+});
+
+Layout.displayName = "Layout";
+
+export default Layout;

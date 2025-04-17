@@ -1,6 +1,6 @@
 import { FC, memo, useMemo, useState } from "react";
 import { Button } from "@heroui/react";
-import { ThumbUpIcon } from "@/components/icons.tsx";
+import { ThumbUpIcon } from "@/utils/icons.tsx";
 import clsx from "clsx";
 
 type ActionButtonProps = {

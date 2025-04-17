@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { createJSONStorage, devtools, persist } from "zustand/middleware";
-import { MemeData } from "@/types/memeData";
-import { ServerResponse, ServerResponseError } from "@/types/apiTypes";
+import { MemeData } from "@/types/memeData.ts";
+import { ServerResponse, ServerResponseError } from "@/types/apiTypes.ts";
 import { apiWithAuth } from "@/config/api";
-import { handleAxiosError } from "@/config/api/utils";
+import { handleAxiosError } from "@/config/api/utils.ts";
 
 interface MemeStoreState {
     meme: MemeData | null;

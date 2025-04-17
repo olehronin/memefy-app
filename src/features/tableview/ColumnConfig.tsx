@@ -1,5 +1,5 @@
 import { Button, Snippet, Tooltip } from "@heroui/react";
-import { EditIcon } from "@/components/icons.tsx";
+import { EditIcon } from "@/utils/icons.tsx";
 import { MemeData } from "@/types/memeData.ts";
 import { Key, ReactNode } from "react";
 

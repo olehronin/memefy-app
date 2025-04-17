@@ -1,6 +1,4 @@
-import { IconType } from "@/components/navbar.tsx";
-
-export type SiteConfig = typeof siteConfig;
+import { IconType } from "@/utils/icon-utils.tsx";
 
 type RouterConfig = {
     name: string;
