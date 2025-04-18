@@ -9,7 +9,7 @@ const Layout: FC<LayoutProps> = memo(({ children }): ReactElement => {
     return (
         <div className="relative flex flex-col h-screen">
             <Navbar />
-            <main className="container mx-auto max-w-7xl px-1 sm:px-2 md:px-6 flex-grow">
+            <main className="container mx-auto max-w-7xl px-1.5 sm:px-2 md:px-6 flex-grow">
                 {children}
             </main>
             <footer

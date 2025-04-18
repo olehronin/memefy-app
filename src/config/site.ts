@@ -16,26 +16,26 @@ export const siteConfig: RouterConfig = {
     name: "MemeFy",
     navItems: [
         {
-            label: "List",
-            href: "/meme-list",
-            icon: "listIcon"
-        },
-        {
             label: "Table",
             href: "/meme-table",
             icon: "tableIcon"
+        },
+        {
+            label: "List",
+            href: "/meme-list",
+            icon: "listIcon"
         }
     ],
     navMenuItems: [
         {
-            label: "List",
-            href: "/meme-list",
-            icon: "listIcon"
-        },
-        {
             label: "Table",
             href: "/meme-table",
             icon: "tableIcon"
+        },
+        {
+            label: "List",
+            href: "/meme-list",
+            icon: "listIcon"
         }
     ]
 };

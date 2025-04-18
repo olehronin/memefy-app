@@ -49,10 +49,10 @@ const PostActionButton: FC<ActionButtonProps> = memo(({
         <Button
             variant="light"
             size="sm"
-            radius="sm"
+            radius="md"
             onPress={handleClick}
             className={clsx(
-                "text-default-800 text-sm data-[hover=true]:bg-content1 transition-colors duration-200",
+                "text-default-800 rounded-[10px] text-sm data-[hover=true]:bg-content1 transition-colors duration-200",
                 isActive && togglesFill && hoverColorMap[hoverColor]
             )}
         >

@@ -1,25 +1,30 @@
 import { create } from "zustand";
-import { createJSONStorage, devtools, persist } from "zustand/middleware";
-import { MemeData } from "@/types/memeData.ts";
+import { devtools } from "zustand/middleware";
+import { Meme, SortBy, SortOrder } from "@/types/meme.ts";
 import { ServerResponse, ServerResponseError } from "@/types/apiTypes.ts";
 import { apiWithAuth } from "@/config/api";
 import { handleAxiosError } from "@/config/api/utils.ts";
+import { PageableResponse } from "@/features/pageable.ts";
+import { addToast } from "@heroui/react";
 
 interface MemeStoreState {
-    meme: MemeData | null;
-    memes: MemeData[];
+    meme: Meme | null;
+    memes: Meme[];
+    sortBy: SortBy;
+    sortOrder: SortOrder;
     isLoading: boolean;
-    isUseJpg: boolean;
     message: string | null;
     error: ServerResponseError | null;
 }
 
 interface MemeStoreActions {
+    setMeme: (meme: Meme) => void;
     fetchOne: (id: number) => Promise<void>;
-    fetchAll: (useImg: boolean) => Promise<void>;
-    patchOne: (id: number, patchData: Partial<MemeData>) => Promise<ServerResponse<MemeData>>;
-    toggleUseJpg: (value?: boolean) => void;
+    fetchAll: (sortBy?: SortBy, direction?: SortOrder) => Promise<void>;
+    patchOne: (id: number, patchData: Partial<Meme>) => Promise<ServerResponse<Meme>>;
     clearStore: () => void;
+    setSortBy: (key: SortBy) => void;
+    setSortOrder: (key: SortOrder) => void;
 }
 
 type MemeStore = MemeStoreState & MemeStoreActions;
@@ -27,106 +32,90 @@ type MemeStore = MemeStoreState & MemeStoreActions;
 const initialState: MemeStoreState = {
     meme: null,
     memes: [],
+    sortBy: SortBy.NAME,
+    sortOrder: SortOrder.ASC,
     isLoading: false,
-    isUseJpg: true,
     message: null,
     error: null
 };
 
 export const useMemeStore = create<MemeStore>()(
-    devtools(persist(
-        (set) => ({
+    devtools(
+        (set, get) => ({
             ...initialState,
-
-            fetchOne: async (id: number) => {
+            setMeme: (meme: Meme) => {
                 set((state) => ({
                     ...state,
-                    isLoading: true,
-                    error: null
+                    meme: meme
                 }));
-                try {
-                    const response = await apiWithAuth.get<ServerResponse<MemeData>>(`/memes/${id}`);
-                    const newMeme = response.data.data;
-                    set((state) => ({
-                        ...state,
-                        meme: newMeme,
-                        memes: state.memes.some((m) => m.id === newMeme.id)
-                            ? state.memes.map((m) => (m.id === newMeme.id ? newMeme : m))
-                            : [...state.memes, newMeme],
-                        isLoading: false
-                    }));
-                } catch (error) {
-                    set((state) => ({
-                        ...state,
-                        isLoading: false,
-                        error: handleAxiosError(error)
-                    }));
-                }
             },
+            fetchAll: async (sortBy?: SortBy, direction?: SortOrder) => {
+                const state = get();
+                const by = sortBy ?? state.sortBy;
+                const sortDirection = direction ?? state.sortOrder;
 
-            fetchAll: async (useImg: boolean) => {
-                set((state) => ({
-                    ...state,
-                    isLoading: true,
-                    error: null
-                }));
+                set({ isLoading: true, error: null });
+
                 try {
-                    const response = await apiWithAuth.get<ServerResponse<MemeData[]>>("/memes", {
-                        params: { useImg: useImg }
+                    const response = await apiWithAuth.get<ServerResponse<PageableResponse<Meme>>>("/memes", {
+                        params: { sortBy: by, direction: sortDirection }
                     });
-                    set((state) => ({
-                        ...state,
-                        memes: response.data.data,
-                        isLoading: false
-                    }));
-                } catch (error) {
 
-                    set((state) => ({
-                        ...state,
+                    set({
+                        memes: response.data.data.content,
+                        isLoading: false
+                    });
+                } catch (error) {
+                    set({
                         isLoading: false,
                         error: handleAxiosError(error)
-                    }));
+                    });
                 }
             },
-
-            patchOne: async (id: number, patchData: Partial<MemeData>) => {
+            patchOne: async (id: number, patchData: Partial<Meme>) => {
                 set((state) => ({
                     ...state,
                     isLoading: true,
                     error: null
                 }));
                 try {
-                    const response = await apiWithAuth.patch<ServerResponse<MemeData>>(
+                    const response = await apiWithAuth.patch<ServerResponse<Meme>>(
                         `/memes/${id}`,
                         patchData
                     );
                     const updatedMeme = response.data.data;
                     set((state) => ({
                         memes: state.memes.map((m) => (m.id === updatedMeme.id ? updatedMeme : m)),
-                        meme: state.meme?.id === updatedMeme.id ? updatedMeme : state.meme
+                        meme: state.meme?.id === updatedMeme.id ? updatedMeme : state.meme,
+                        isLoading: false,
+                        error: null
                     }));
+                    addToast({ title: response.data.message, color: "success" });
                     return response.data;
-                } catch (error) {
+                } catch (err) {
+                    const error = handleAxiosError(err);
                     set((state) => ({
                         ...state,
                         isLoading: false,
-                        error: handleAxiosError(error)
+                        error: error
                     }));
-                    throw handleAxiosError(error);
+                    addToast({ title: error.message, color: "danger" });
+                    throw error;
                 }
             },
 
-            toggleUseJpg: (value?: boolean) => {
-                set((state) => ({
-                    isUseJpg: value ?? !state.isUseJpg
-                }));
+
+            setSortBy: (key: SortBy) => {
+                set({ sortBy: key });
+                get().fetchAll();
             },
 
+            setSortOrder: (key: SortOrder) => {
+                set({ sortOrder: key });
+                get().fetchAll();
+            },
             clearStore: () => set(initialState)
-        }), {
-            name: "meme-mode",
-            storage: createJSONStorage(() => localStorage),
-            partialize: (state) => ({ isUseJpg: state.isUseJpg })
+
         })
     )
 );
