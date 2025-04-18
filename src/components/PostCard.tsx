@@ -35,9 +35,10 @@ const PostCard = memo(({ data }: PostCardProps): ReactElement => {
                         as={Link}
                         size={"sm"}
                         target={"_blank"}
+                        showAnchorIcon={true}
                         href={data.imageUrl}
                         rel="noopener noreferrer"
-                        className={"rounded-[10px]"}
+                        className={"rounded-[10px] bg-content3 text-sm data-[hover=true]:bg-default"}
                     >
                         View Source
                     </Button>

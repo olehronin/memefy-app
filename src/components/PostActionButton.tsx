@@ -47,18 +47,16 @@ const PostActionButton: FC<ActionButtonProps> = memo(({
 
     return (
         <Button
-            variant="light"
-            size="sm"
-            radius="md"
+            size={"sm"}
+            radius={"md"}
             onPress={handleClick}
             className={clsx(
-                "text-default-800 rounded-[10px] text-sm data-[hover=true]:bg-content1 transition-colors duration-200",
+                "text-default-800 rounded-[10px] text-sm bg-content3 data-[hover=true]:bg-default transition-colors duration-200",
                 isActive && togglesFill && hoverColorMap[hoverColor]
             )}
         >
             <ThumbUpIcon
-                width={20}
-                height={20}
+                size={20}
                 fill={isActive && togglesFill ? "currentColor" : "none"}
             />
             <span

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { Meme, SortBy, SortOrder } from "@/types/meme.ts";
 import { ServerResponse, ServerResponseError } from "@/types/apiTypes.ts";
-import { apiWithAuth } from "@/config/api";
+import { apiWithAuth } from "@/config/api/api.ts";
 import { handleAxiosError } from "@/config/api/utils.ts";
 import { PageableResponse } from "@/features/pageable.ts";
 import { addToast } from "@heroui/react";
@@ -18,6 +18,7 @@ interface MemeStoreState {
 }
 
 interface MemeStoreActions {
+    isCached: () => boolean;
     setMeme: (meme: Meme) => void;
     fetchOne: (id: number) => Promise<void>;
     fetchAll: (sortBy?: SortBy, direction?: SortOrder) => Promise<void>;
@@ -49,6 +50,10 @@ export const useMemeStore = create<MemeStore>()(
                     meme: meme
                 }));
             },
+            isCached: (): boolean => {
+                const state = get();
+                return state.memes.length > 0;
+            },
             fetchAll: async (sortBy?: SortBy, direction?: SortOrder) => {
                 const state = get();
                 const by = sortBy ?? state.sortBy;
@@ -66,9 +71,14 @@ export const useMemeStore = create<MemeStore>()(
                         isLoading: false
                     });
                 } catch (error) {
+                    const axiosError = handleAxiosError(error);
                     set({
                         isLoading: false,
-                        error: handleAxiosError(error)
+                        error: axiosError
+                    });
+                    addToast({
+                        title: axiosError.message,
+                        color: "danger"
                     });
                 }
             },
@@ -103,16 +113,13 @@ export const useMemeStore = create<MemeStore>()(
                     throw error;
                 }
             },
-
-
             setSortBy: (key: SortBy) => {
                 set({ sortBy: key });
-                get().fetchAll();
+                get().fetchAll(key, get().sortOrder);
             },
-
             setSortOrder: (key: SortOrder) => {
                 set({ sortOrder: key });
-                get().fetchAll();
+                get().fetchAll(get().sortBy, key);
             },
             clearStore: () => set(initialState)
 
