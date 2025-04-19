@@ -1,4 +1,4 @@
-import { memo, ReactElement, SyntheticEvent, useCallback, useMemo, useState } from "react";
+import { memo, ReactElement, useCallback } from "react";
 import { Button, Card, Image } from "@heroui/react";
 import PostActionButton from "@/components/PostActionButton.tsx";
 import { Link } from "@heroui/link";
@@ -10,19 +10,12 @@ type PostCardProps = {
 };
 
 const ImageWithLoader = ({ src, alt }: { src: string; alt: string }) => {
-    const [isLoading, setIsLoading] = useState(true);
-
-    const handleLoad = useMemo(() => (e: SyntheticEvent<HTMLImageElement>) => {
-        setIsLoading(e.type !== "load");
-    }, []);
-
     return (
         <Image
             alt={alt}
             src={src}
             isBlurred={true}
-            onLoad={handleLoad}
-            className={clsx("w-full", isLoading ? "h-96" : "h-auto")}
+            className={clsx("w-full")}
             classNames={{ wrapper: "!max-w-none" }}
         />
     );

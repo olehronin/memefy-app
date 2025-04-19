@@ -106,7 +106,7 @@ const MobileMenu = () => (
 );
 
 const Navbar = memo(() => (
-    <HeroUINavbar maxWidth={"xl"} shouldHideOnScroll={true}>
+    <HeroUINavbar maxWidth={"xl"} position={"sticky"}>
         <NavbarContent>
             <LogoLink />
         </NavbarContent>

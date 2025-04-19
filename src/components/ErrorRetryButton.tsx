@@ -1,6 +1,6 @@
 import { Button } from "@heroui/react";
 import { ServerResponseError } from "@/types/apiTypes.ts";
-import { useMemeStore } from "@/features/useMemeStore.ts";
+import { useMemeStore } from "@/features/hooks/useMemeStore.ts";
 import clsx from "clsx";
 import { memo } from "react";
 

@@ -14,7 +14,7 @@ import {
 import { FormEvent, Fragment, KeyboardEvent, memo, ReactElement, useCallback, useEffect, useState } from "react";
 import { Meme } from "@/types/meme.ts";
 import { validateAndCheckImage } from "@/utils/validations.ts";
-import { useMemeStore } from "@/features/useMemeStore.ts";
+import { useMemeStore } from "@/features/hooks/useMemeStore.ts";
 import {
     BETWEEN_0_AND_99_CHARACTERS,
     BETWEEN_3_AND_100_CHARACTERS,

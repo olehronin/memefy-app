@@ -1,21 +1,21 @@
 import { ReactElement, useEffect } from "react";
 import ListView from "@/features/listview/ListView.tsx";
 import Layout from "@/layouts/Layout";
-import { useMemeStore } from "@/features/useMemeStore.ts";
-import { direction, sortBy } from "@/utils/meme-sort.ts";
-import { SortSelect } from "@/components/SortSelect.tsx";
+import { useMemeData } from "@/features/hooks/useMemeData.ts";
+import MemeSortControls from "@/components/MemeSortControls.tsx";
 
 const ListPage = (): ReactElement => {
-    const memes = useMemeStore((state) => state.memes);
-    const fetchAll = useMemeStore((state) => state.fetchAll);
-    const isLoading = useMemeStore((state) => state.isLoading);
-    const error = useMemeStore((state) => state.error);
-
-    const setSort = useMemeStore((state) => state.setSortBy);
-    const setSortOrder = useMemeStore((state) => state.setSortOrder);
-    const sortByKey = useMemeStore((state) => state.sortBy);
-    const sortOrder = useMemeStore((state) => state.sortOrder);
-    const isCached = useMemeStore((state) => state.isCached);
+    const {
+        memes,
+        fetchAll,
+        isLoading,
+        error,
+        sortByKey,
+        sortOrder,
+        setSort,
+        setSortOrder,
+        isCached
+    } = useMemeData();
 
     useEffect(() => {
         if (!isCached() && !isLoading) {
@@ -25,27 +25,16 @@ const ListPage = (): ReactElement => {
 
     return (
         <Layout>
-            <section className={"flex flex-col items-center justify-center gap-4 py-8 md:py-10 relative"}>
+            <section className={"flex flex-col items-center justify-center py-4 md:py-8 relative"}>
                 <div className={"w-full flex items-center justify-between"}>
                     <h1 className={"text-sm sm:text-xl"}>Memes: {memes.length}</h1>
-                    <div className={"flex gap-2"}>
-                        <SortSelect
-                            label={"Sort By"}
-                            ariaLabelledby={"Select sorted by"}
-                            options={sortBy}
-                            selectedKey={sortByKey}
-                            onChange={setSort}
-                        />
-                        <SortSelect
-                            label={"Direction"}
-                            ariaLabelledby={"Select direction by"}
-                            options={direction}
-                            selectedKey={sortOrder}
-                            onChange={setSortOrder}
-                        />
-                    </div>
+                    <MemeSortControls
+                        sortByKey={sortByKey}
+                        sortOrder={sortOrder}
+                        onSortChange={setSort}
+                        onDirectionChange={setSortOrder}
+                    />
                 </div>
-
                 <ListView elements={memes} isLoading={isLoading} error={error} />
             </section>
         </Layout>
