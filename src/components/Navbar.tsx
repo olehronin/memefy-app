@@ -15,7 +15,8 @@ import { link as linkStyles } from "@heroui/theme";
 import { siteConfig } from "@/config/site";
 import { getIcon } from "@/utils/icon-utils.tsx";
 import ThemeSwitch from "@/components/ThemeSwitch.tsx";
-import { Logo } from "@/utils/icons.tsx";
+import { GithubIcon, Logo } from "@/utils/icons.tsx";
+import { Button } from "@heroui/react";
 
 const LogoLink = () => (
     <NavbarBrand className={"gap-3 max-w-fit"}>
@@ -70,6 +71,27 @@ const MobileMenu = () => (
     </NavbarMenu>
 );
 
+type NavButtonProps = {
+    title: string;
+    href: string;
+    className?: string;
+}
+
+const NavButton = ({ title, href, className, ...props }: NavButtonProps) => (
+    <Button
+        as={Link}
+        target={"_blank"}
+        rel="noopener noreferrer"
+        className={clsx("text-base md:text-foreground min-w-10 md:min-w-20 w-10 h-10 md:w-auto px-0 md:px-4", className)}
+        variant={"light"}
+        href={href}
+        {...props}
+    >
+        <GithubIcon />
+        <span className={"hidden md:block"}>{title}</span>
+    </Button>
+);
+
 const Navbar = memo(() => {
     return (
         <HeroUINavbar maxWidth="xl" position="sticky">
@@ -81,7 +103,17 @@ const Navbar = memo(() => {
                 <NavLinks />
             </NavbarContent>
 
-            <NavbarContent className="hidden sm:flex basis-1/5 sm:basis-full" justify="end">
+            <NavbarContent className="hidden sm:flex basis-1/5 sm:basis-full gap-2" justify="end">
+                <div className={"flex gap-1"}>
+                    <NavbarItem>
+                        <NavButton title={"App"} href={"https://github.com/olehronin/memefy-app"}
+                                   className={"text-teal-500"} />
+                    </NavbarItem>
+                    <NavbarItem>
+                        <NavButton title={"Server"} href={"https://github.com/olehronin/memefy-server"}
+                                   className={"text-indigo-500"} />
+                    </NavbarItem>
+                </div>
                 <NavbarItem className="hidden sm:flex gap-2">
                     <ThemeSwitch />
                 </NavbarItem>

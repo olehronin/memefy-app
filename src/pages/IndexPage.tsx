@@ -22,7 +22,7 @@ const IndexPage = (): ReactElement => {
                             MemeFy is your ultimate destination for the freshest,
                             funniest, and most viral memes on the internet.
                         </p>
-                        <p className={"font-medium mt-3 text-lg text-blue-200"}>Dive in and let the laughs begin!</p>
+                        <p className={"font-medium mt-3 text-lg text-foreground"}>Dive in and let the laughs begin!</p>
                     </div>
                 </div>
             </section>

@@ -1,8 +1,8 @@
 import { ReactElement } from "react";
-import { ListIcon, TableIcon } from "@/utils/icons.tsx";
+import { GithubIcon, ListIcon, TableIcon } from "@/utils/icons.tsx";
 
 
-export type IconType = "listIcon" | "tableIcon";
+export type IconType = "listIcon" | "tableIcon" | "gihHubIcon";
 
 export const getIcon = (icon?: IconType): ReactElement | null => {
     switch (icon) {
@@ -10,6 +10,8 @@ export const getIcon = (icon?: IconType): ReactElement | null => {
             return <ListIcon />;
         case "tableIcon":
             return <TableIcon />;
+        case "gihHubIcon":
+            return <GithubIcon />;
         default:
             return null;
     }

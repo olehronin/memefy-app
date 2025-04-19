@@ -36,6 +36,16 @@ export const siteConfig: RouterConfig = {
             label: "List",
             href: "/meme-list",
             icon: "listIcon"
+        },
+        {
+            label: "GitHub App",
+            href: "https://github.com/olehronin/memefy-app",
+            icon: "gihHubIcon"
+        },
+        {
+            label: "GitHub Server",
+            href: "https://github.com/olehronin/memefy-server",
+            icon: "gihHubIcon"
         }
     ]
 };

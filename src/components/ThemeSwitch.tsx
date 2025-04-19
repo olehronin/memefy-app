@@ -53,15 +53,13 @@ const ThemeSwitch: FC<ThemeSwitchProps> = memo(({ className, classNames }) => {
                 className={slots.wrapper({
                     class: clsx(
                         [
-                            "w-auto h-auto",
+                            "w-10 h-10",
                             "bg-transparent",
-                            "rounded-lg",
+                            "rounded-xl",
                             "flex items-center justify-center",
                             "group-data-[selected=true]:bg-transparent",
-                            "!text-default-500",
-                            "pt-px",
-                            "px-0",
-                            "mx-0"
+                            "hover:bg-default/40",
+                            "!text-foreground"
                         ],
                         classNames?.wrapper
                     )
