@@ -24,7 +24,7 @@ const ListView = memo(({ elements, isLoading, error }: ListViewProps): ReactElem
     }
 
     return (
-        <div className={"columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 py-4 [column-fill:_balance]"}>
+        <div className={"columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 py-4 [column-fill:_balance] w-full"}>
             {elements.map((meme) => (
                 <PostCard key={meme.id} data={meme} />
             ))}

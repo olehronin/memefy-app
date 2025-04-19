@@ -141,13 +141,19 @@ const TableEditorModal = memo(({
                             <ModalBody className={"flex flex-col gap-2"}>
                                 <div className={"flex flex-col gap-4"}>
                                     <div className={"flex justify-center"}>
-                                        <Image
-                                            radius={"lg"}
-                                            alt={"Preview"}
-                                            isBlurred={true}
-                                            src={formData.imageUrl}
-                                            className={"w-28 h-28 object-cover border-primary-600 border-2 shadow"}
-                                        />
+                                        {errors.imageUrl ? (
+                                            <div className={"w-28 h-28 bg-content4 rounded-2xl shadow-md flex justify-center items-center"}>
+                                                Oops..
+                                            </div>
+                                        ) : (
+                                            <Image
+                                                radius={"lg"}
+                                                alt={"Preview"}
+                                                isBlurred={true}
+                                                src={formData.imageUrl}
+                                                className={"w-28 h-28 object-cover border-primary-600 border-2 shadow"}
+                                            />
+                                        )}
                                     </div>
                                     <Input
                                         size={"sm"}
