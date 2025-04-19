@@ -16,14 +16,14 @@ function TablePage() {
     const fetchAll = useMemeStore((state) => state.fetchAll);
     const patchOne = useMemeStore((state) => state.patchOne);
     const isLoading = useMemeStore((state) => state.isLoading);
-
+    const error = useMemeStore((state) => state.error);
     const isCached = useMemeStore((state) => state.isCached);
 
     useEffect(() => {
         if (!isCached() && !isLoading) {
             fetchAll();
         }
-    }, [isCached, fetchAll, isLoading]);
+    }, [isCached, fetchAll]);
 
     const onTableAction = useCallback((element: Meme) => {
         onOpen();
@@ -44,6 +44,7 @@ function TablePage() {
                         data={memes}
                         handleEdit={onTableAction}
                         isLoading={isLoading}
+                        error={error}
                     />
                 </div>
             </section>

@@ -2,8 +2,8 @@ import { memo, ReactElement } from "react";
 import PostCard from "@/components/PostCard.tsx";
 import { Meme } from "@/types/meme.ts";
 import { ServerResponseError } from "@/types/apiTypes.ts";
-import { Button, Spinner } from "@heroui/react";
-import { useMemeStore } from "@/features/useMemeStore.ts";
+import { Spinner } from "@heroui/react";
+import ErrorRetryButton from "@/components/ErrorRetryButton.tsx";
 
 type ListViewProps = {
     elements: Meme[];
@@ -16,14 +16,7 @@ const ListView = memo(({ elements, isLoading, error }: ListViewProps): ReactElem
         return <Spinner variant={"spinner"} size={"lg"} aria-label={"Loading..."} />;
     }
     if (error) {
-        return (
-            <div className={"flex flex-col gap-2 text-red-500 text-center p-4"}>
-                Error: {error.message || "Failed to load memes"}
-                <Button onPress={() => useMemeStore.getState().fetchAll()}>
-                    Try Again
-                </Button>
-            </div>
-        );
+        return <ErrorRetryButton error={error} />;
     }
 
     if (!elements.length) {

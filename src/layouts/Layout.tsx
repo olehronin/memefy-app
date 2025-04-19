@@ -7,7 +7,7 @@ type LayoutProps = {
 
 const Layout: FC<LayoutProps> = memo(({ children }): ReactElement => {
     return (
-        <div className="relative flex flex-col h-screen">
+        <div className="relative flex flex-col min-h-screen">
             <Navbar />
             <main className="container mx-auto max-w-7xl px-1.5 sm:px-2 md:px-6 flex-grow">
                 {children}

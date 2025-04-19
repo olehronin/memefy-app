@@ -4,6 +4,13 @@ type RouterConfig = {
     name: string;
     navItems: NavItems[];
     navMenuItems: NavItems[];
+    externalLinks: ExternalLink[];
+};
+
+type ExternalLink = {
+    title: string;
+    href: string;
+    colorClass?: string;
 };
 
 type NavItems = {
@@ -15,37 +22,15 @@ type NavItems = {
 export const siteConfig: RouterConfig = {
     name: "MemeFy",
     navItems: [
-        {
-            label: "Table",
-            href: "/meme-table",
-            icon: "tableIcon"
-        },
-        {
-            label: "List",
-            href: "/meme-list",
-            icon: "listIcon"
-        }
+        { label: "Table", href: "/meme-table", icon: "tableIcon" },
+        { label: "List", href: "/meme-list", icon: "listIcon" }
     ],
     navMenuItems: [
-        {
-            label: "Table",
-            href: "/meme-table",
-            icon: "tableIcon"
-        },
-        {
-            label: "List",
-            href: "/meme-list",
-            icon: "listIcon"
-        },
-        {
-            label: "GitHub App",
-            href: "https://github.com/olehronin/memefy-app",
-            icon: "gihHubIcon"
-        },
-        {
-            label: "GitHub Server",
-            href: "https://github.com/olehronin/memefy-server",
-            icon: "gihHubIcon"
-        }
+        { label: "Table", href: "/meme-table", icon: "tableIcon" },
+        { label: "List", href: "/meme-list", icon: "listIcon" }
+    ],
+    externalLinks: [
+        { title: "App", href: "https://github.com/olehronin/memefy-app", colorClass: "text-teal-500" },
+        { title: "Server", href: "https://github.com/olehronin/memefy-server", colorClass: "text-indigo-500" }
     ]
 };

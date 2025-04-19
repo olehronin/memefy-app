@@ -12,11 +12,14 @@ import {
 } from "@heroui/react";
 import { EditIcon } from "@/utils/icons.tsx";
 import { Meme } from "@/types/meme.ts";
+import { ServerResponseError } from "@/types/apiTypes.ts";
+import ErrorRetryButton from "@/components/ErrorRetryButton.tsx";
 
-interface TableRendererProps {
+type TableRendererProps = {
     data: Meme[];
     handleEdit: (item: Meme) => void;
     isLoading?: boolean;
+    error?: ServerResponseError | null;
 }
 
 export const columns = [
@@ -27,7 +30,7 @@ export const columns = [
     { name: "ACTIONS", uid: "actions", align: "center" }
 ];
 
-const TableRenderer = memo(({ data, handleEdit, isLoading }: TableRendererProps): ReactElement => {
+const TableRenderer = memo(({ data, handleEdit, isLoading, error }: TableRendererProps): ReactElement => {
     const headerColumns = useMemo(() => columns, []);
 
     const renderCell = useCallback((value: Meme, columnKey: Key) => {
@@ -35,9 +38,7 @@ const TableRenderer = memo(({ data, handleEdit, isLoading }: TableRendererProps)
 
         switch (columnKey) {
             case "id":
-                return (
-                    <span>{value.id}</span>
-                );
+                return <span>{value.id}</span>;
             case "name":
                 return (
                     <div className={"flex w-full"}>
@@ -55,9 +56,7 @@ const TableRenderer = memo(({ data, handleEdit, isLoading }: TableRendererProps)
                     </Snippet>
                 );
             case "likes":
-                return (
-                    <span>{value.likes}</span>
-                );
+                return <span>{value.likes}</span>;
             case "actions":
                 return (
                     <div className={"relative flex items-center gap-2"}>
@@ -74,7 +73,7 @@ const TableRenderer = memo(({ data, handleEdit, isLoading }: TableRendererProps)
             default:
                 return cellValue;
         }
-    }, []);
+    }, [handleEdit]);
 
     return (
         <Table
@@ -100,7 +99,7 @@ const TableRenderer = memo(({ data, handleEdit, isLoading }: TableRendererProps)
             </TableHeader>
             <TableBody
                 items={data}
-                isLoading={isLoading}
+                isLoading={isLoading && !error}
                 emptyContent={"No elements found"}
                 loadingContent={
                     <Spinner
@@ -111,10 +110,18 @@ const TableRenderer = memo(({ data, handleEdit, isLoading }: TableRendererProps)
                     />
                 }
             >
-                {(item) => (
-                    <TableRow key={item.id}>
-                        {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                {error ? (
+                    <TableRow key={"error"}>
+                        <TableCell colSpan={columns.length} className="text-center py-4">
+                            <ErrorRetryButton error={error} />
+                        </TableCell>
                     </TableRow>
+                ) : (
+                    (item) => (
+                        <TableRow key={item.id}>
+                            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                        </TableRow>
+                    )
                 )}
             </TableBody>
         </Table>

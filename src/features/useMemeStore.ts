@@ -33,7 +33,7 @@ type MemeStore = MemeStoreState & MemeStoreActions;
 const initialState: MemeStoreState = {
     meme: null,
     memes: [],
-    sortBy: SortBy.NAME,
+    sortBy: SortBy.ID,
     sortOrder: SortOrder.ASC,
     isLoading: false,
     message: null,
