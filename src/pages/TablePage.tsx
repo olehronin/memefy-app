@@ -1,38 +1,40 @@
-import { useCallback, useEffect } from "react";
-import { useDisclosure } from "@heroui/react";
-import Layout from "@/layouts/Layout.tsx";
-import TableEditorModal from "@/features/tableview/TableEditorModal.tsx";
-import TableRenderer from "@/features/tableview/TableRenderer.tsx";
-import { Meme } from "@/types/meme.ts";
-import { useMemeData } from "@/features/hooks/useMemeData.ts";
-import MemeSortControls from "@/components/MemeSortControls.tsx";
+import {useCallback, useEffect} from "react";
+import {useDisclosure} from "@heroui/react";
+import Layout from "@/layouts/Layout";
+import TableEditorModal from "@/features/table/TableEditorModal.tsx";
+import {useMemeData} from "@/features/hooks/useMemeData";
+import {DEFAULT_PAGE_SIZE} from "@/utils/PageableBuilder";
+import MemeTable from "@/features/table/MemeTable.tsx";
+import {Meme} from "@/types/meme.ts";
 
-function TablePage() {
-    const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+const TablePage = () => {
+    const {isOpen, onOpen, onClose, onOpenChange} = useDisclosure();
     const {
+        meme,
         memes,
-        setMeme, meme,
-        patchOne,
-        fetchAll,
-        isCached,
-        isLoading,
         error,
-        sortByKey,
-        sortOrder,
-        setSort,
-        setSortOrder
+        isLoading,
+        pageInfo,
+        patchOne,
+        isCached,
+        setMeme,
+        loadPage
     } = useMemeData();
 
-    useEffect(() => {
-        if (!isCached() && !isLoading) {
-            fetchAll();
+    const loadInitialPage = useCallback(async () => {
+        if (!isCached()) {
+            await loadPage(pageInfo.number, pageInfo.size || DEFAULT_PAGE_SIZE);
         }
-    }, [isCached, fetchAll]);
+    }, [isCached, loadPage, pageInfo.number, pageInfo.size]);
 
-    const onTableAction = useCallback((element: Meme) => {
-        onOpen();
+    useEffect(() => {
+        loadInitialPage();
+    }, [loadPage]);
+
+    const handleEdit = useCallback((element: Meme) => {
         setMeme(element);
-    }, [onOpen]);
+        onOpen();
+    }, [setMeme, onOpen]);
 
     const handleSave = useCallback(async (element: Meme) => {
         if (element) {
@@ -44,22 +46,7 @@ function TablePage() {
         <Layout>
             <section className={"flex flex-col items-center justify-center gap-4 py-4 md:py-8"}>
                 <div className={"w-full max-w-[900px]"}>
-                    <div className={"px-1 sm:px-2 flex gap-2 items-center justify-end"}>
-                        <MemeSortControls
-                            sortByKey={sortByKey}
-                            sortOrder={sortOrder}
-                            onSortChange={setSort}
-                            onDirectionChange={setSortOrder}
-                        />
-                    </div>
-                    <div className={"py-2"}>
-                        <TableRenderer
-                            data={memes}
-                            handleEdit={onTableAction}
-                            isLoading={isLoading}
-                            error={error}
-                        />
-                    </div>
+                    <MemeTable memes={memes} isLoading={isLoading} error={error} onEdit={handleEdit}/>
                 </div>
             </section>
             {meme && (
@@ -72,6 +59,6 @@ function TablePage() {
             )}
         </Layout>
     );
-}
+};
 
 export default TablePage;

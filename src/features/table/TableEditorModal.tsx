@@ -16,10 +16,10 @@ import { Meme } from "@/types/meme.ts";
 import { validateAndCheckImage } from "@/utils/validations.ts";
 import { useMemeStore } from "@/features/hooks/useMemeStore.ts";
 import {
-    BETWEEN_0_AND_99_CHARACTERS,
-    BETWEEN_3_AND_100_CHARACTERS,
+    SHOULD_NOT_BE_LESS_THAN_0,
+    BETWEEN_3_AND_1024_CHARACTERS,
     IMAGE_URL_IS_REQUIRED,
-    MUST_BE_VALID_JPG_OR_JPEG
+    MUST_BE_VALID_JPG_JPEG_GIF_OR_PNG
 } from "@/utils/constants.ts";
 
 type EditorModalProps = {
@@ -54,8 +54,8 @@ const TableEditorModal = memo(({
 
         if (key === "name") {
             const name = value as string;
-            if (!name || name.length < 3 || name.length > 100) {
-                newErrors.name = BETWEEN_3_AND_100_CHARACTERS;
+            if (!name || name.length < 3 || name.length > 1024) {
+                newErrors.name = BETWEEN_3_AND_1024_CHARACTERS;
             } else {
                 delete newErrors.name;
             }
@@ -63,8 +63,8 @@ const TableEditorModal = memo(({
 
         if (key === "likes") {
             const likes = Number(value);
-            if (likes < 0 || likes > 99) {
-                newErrors.likes = BETWEEN_0_AND_99_CHARACTERS;
+            if (likes < 0) {
+                newErrors.likes = SHOULD_NOT_BE_LESS_THAN_0;
             } else {
                 delete newErrors.likes;
             }
@@ -77,7 +77,7 @@ const TableEditorModal = memo(({
             } else {
                 const b = await validateAndCheckImage(url);
                 if (!b) {
-                    newErrors.imageUrl = MUST_BE_VALID_JPG_OR_JPEG;
+                    newErrors.imageUrl = MUST_BE_VALID_JPG_JPEG_GIF_OR_PNG;
                 } else {
                     delete newErrors.imageUrl;
                 }
@@ -169,8 +169,8 @@ const TableEditorModal = memo(({
                                     />
                                 </div>
                                 <Divider />
-                                <div className="flex flex-col gap-2">
-                                    <div className="flex-1 flex gap-2">
+                                <div className={"flex flex-col gap-2"}>
+                                    <div className={"flex-1 flex gap-2"}>
                                         <NumberInput
                                             size={"sm"}
                                             radius={"lg"}
@@ -182,7 +182,6 @@ const TableEditorModal = memo(({
                                         />
                                         <NumberInput
                                             min={0}
-                                            max={99}
                                             size={"sm"}
                                             radius={"lg"}
                                             label={"Likes"}
@@ -196,7 +195,7 @@ const TableEditorModal = memo(({
                                     </div>
                                     <Input
                                         min={3}
-                                        max={100}
+                                        max={1024}
                                         size={"sm"}
                                         radius={"lg"}
                                         isRequired={true}

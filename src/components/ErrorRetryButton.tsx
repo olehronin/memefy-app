@@ -1,33 +1,37 @@
-import { Button } from "@heroui/react";
-import { ServerResponseError } from "@/types/apiTypes.ts";
-import { useMemeStore } from "@/features/hooks/useMemeStore.ts";
+import {memo, useCallback} from "react";
+import {Button} from "@heroui/react";
+import {ServerResponseError} from "@/types/apiTypes";
+import {useMemeData} from "@/features/hooks/useMemeData";
 import clsx from "clsx";
-import { memo } from "react";
+import {DEFAULT_PAGE_SIZE} from "@/utils/PageableBuilder";
 
 interface ErrorRetryProps {
     error: ServerResponseError | null;
     className?: string;
 }
 
-const ErrorRetryButton = memo(({ error, className }: ErrorRetryProps) => {
-    const fetchAll = useMemeStore((state) => state.fetchAll);
+const ErrorRetryButton = memo(({error, className}: ErrorRetryProps) => {
+    const {fetchAll, getPageableBuilder, pageInfo} = useMemeData();
 
-    const handleRetry = async () => {
-        await fetchAll();
-    };
+    const handleRetry = useCallback(async () => {
+        const pageable = getPageableBuilder(pageInfo.number, pageInfo.size || DEFAULT_PAGE_SIZE);
+        await fetchAll(pageable);
+    }, [fetchAll, getPageableBuilder, pageInfo.number, pageInfo.size]);
 
     if (!error) return null;
 
     return (
-        <div className={clsx("flex flex-col gap-4 text-red-500 text-center items-center p-4", className)}>
-            <div>Error: {error.message || "Failed to load memes"}</div>
+        <div className={clsx("flex flex-col gap-4 text-red-500 text-center items-center justify-center p-4", className)}>
+            <div className={"text-sm sm:text-base"}>
+                {error.message || "Failed to load memes"}
+            </div>
             <Button
                 variant={"faded"}
                 onPress={handleRetry}
                 aria-label={"Retry loading"}
-                className={"text-white px-4 py-2 max-w-48 "}
+                className={"text-white px-4 py-2 max-w-48"}
             >
-                Try Again
+                Try again
             </Button>
         </div>
     );

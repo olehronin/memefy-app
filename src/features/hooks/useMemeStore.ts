@@ -1,31 +1,31 @@
-import { create } from "zustand";
-import { devtools } from "zustand/middleware";
-import { Meme, SortBy, SortOrder } from "@/types/meme.ts";
-import { ServerResponse, ServerResponseError } from "@/types/apiTypes.ts";
-import { apiWithAuth } from "@/config/api/api.ts";
-import { handleAxiosError } from "@/config/api/utils.ts";
-import { PageableResponse } from "@/features/pageable.ts";
-import { addToast } from "@heroui/react";
+import {create} from "zustand";
+import {Meme} from "@/types/meme.ts";
+import {addToast} from "@heroui/react";
+import {devtools} from "zustand/middleware";
+import {ServerResponse, ServerResponseError} from "@/types/apiTypes.ts";
+import {apiWithAuth} from "@/config/api/api.ts";
+import {handleAxiosError} from "@/config/api/utils.ts";
+import {Pageable, PageableResponse, SortBy, SortOrder} from "@/types/pageable.ts";
+import {DEFAULT_PAGE_SIZE, PageableBuilder} from "@/utils/PageableBuilder.ts";
 
 interface MemeStoreState {
     meme: Meme | null;
     memes: Meme[];
     sortBy: SortBy;
     sortOrder: SortOrder;
+    pageInfo: Pageable;
+    hasMore: boolean;
     isLoading: boolean;
-    message: string | null;
     error: ServerResponseError | null;
 }
 
 interface MemeStoreActions {
-    isCached: () => boolean;
-    setMeme: (meme: Meme) => void;
-    fetchOne: (id: number) => Promise<void>;
-    fetchAll: (sortBy?: SortBy, direction?: SortOrder) => Promise<void>;
+    setMeme: (meme: Meme | null) => void;
+    fetchAll: (pageable: PageableBuilder) => Promise<void>;
     patchOne: (id: number, patchData: Partial<Meme>) => Promise<ServerResponse<Meme>>;
+    setSort: (sortBy: SortBy, sortOrder: SortOrder) => void;
     clearStore: () => void;
-    setSortBy: (key: SortBy) => void;
-    setSortOrder: (key: SortOrder) => void;
+    getPageableBuilder: (page?: number, size?: number, sortByOverride?: SortBy, sortOrderOverride?: SortOrder) => PageableBuilder;
 }
 
 type MemeStore = MemeStoreState & MemeStoreActions;
@@ -35,94 +35,82 @@ const initialState: MemeStoreState = {
     memes: [],
     sortBy: SortBy.ID,
     sortOrder: SortOrder.ASC,
+    pageInfo: {totalPages: 0, size: 0, number: 0, totalElements: 0},
+    hasMore: true,
     isLoading: false,
-    message: null,
     error: null
 };
 
 export const useMemeStore = create<MemeStore>()(
-    devtools(
-        (set, get) => ({
-            ...initialState,
-            setMeme: (meme: Meme) => {
+    devtools((set, get) => ({
+        ...initialState,
+        setMeme: (meme) => set({meme}),
+        fetchAll: async (pageable: PageableBuilder): Promise<void> => {
+            set({isLoading: true, error: null});
+            try {
+                const response = await apiWithAuth.get<ServerResponse<PageableResponse<Meme>>>("/memes", {
+                    params: pageable.toParams(),
+                });
                 set((state) => ({
-                    ...state,
-                    meme: meme
+                    memes: pageable.page > state.pageInfo.number ? [...state.memes, ...response.data.data.content] : response.data.data.content,
+                    pageInfo: response.data.data.page,
+                    hasMore: response.data.data.page.number + 1 < response.data.data.page.totalPages,
+                    isLoading: false,
                 }));
-            },
-            isCached: (): boolean => {
-                const state = get();
-                return state.memes.length > 0;
-            },
-            fetchAll: async (sortBy?: SortBy, direction?: SortOrder) => {
-                const state = get();
-                const by = sortBy ?? state.sortBy;
-                const sortDirection = direction ?? state.sortOrder;
-
-                set({ isLoading: true, error: null });
-
-                try {
-                    const response = await apiWithAuth.get<ServerResponse<PageableResponse<Meme>>>("/memes", {
-                        params: { sortBy: by, direction: sortDirection }
-                    });
-
-                    set({
-                        memes: response.data.data.content,
-                        isLoading: false
-                    });
-                } catch (error) {
-                    const axiosError = handleAxiosError(error);
-                    set({
-                        isLoading: false,
-                        error: axiosError
-                    });
-                    addToast({
-                        title: axiosError.message,
-                        color: "danger"
-                    });
-                }
-            },
-            patchOne: async (id: number, patchData: Partial<Meme>) => {
+            } catch (error) {
+                const axiosError = handleAxiosError(error);
+                set({isLoading: false, error: axiosError});
+                addToast({title: axiosError.message, color: "danger"});
+            }
+        },
+        patchOne: async (id: number, patchData: Partial<Meme>) => {
+            set({isLoading: true, error: null});
+            try {
+                const response = await apiWithAuth.patch<ServerResponse<Meme>>(`/memes/${id}`, patchData);
+                const updatedMeme = response.data.data;
                 set((state) => ({
-                    ...state,
-                    isLoading: true,
-                    error: null
+                    memes: state.memes.map((m) => (m.id === updatedMeme.id ? updatedMeme : m)),
+                    meme: state.meme?.id === updatedMeme.id ? updatedMeme : state.meme,
+                    isLoading: false,
                 }));
-                try {
-                    const response = await apiWithAuth.patch<ServerResponse<Meme>>(
-                        `/memes/${id}`,
-                        patchData
-                    );
-                    const updatedMeme = response.data.data;
-                    set((state) => ({
-                        memes: state.memes.map((m) => (m.id === updatedMeme.id ? updatedMeme : m)),
-                        meme: state.meme?.id === updatedMeme.id ? updatedMeme : state.meme,
-                        isLoading: false,
-                        error: null
-                    }));
-                    addToast({ title: response.data.message, color: "success" });
-                    return response.data;
-                } catch (err) {
-                    const error = handleAxiosError(err);
-                    set((state) => ({
-                        ...state,
-                        isLoading: false,
-                        error: error
-                    }));
-                    addToast({ title: error.message, color: "danger" });
-                    throw error;
-                }
-            },
-            setSortBy: (key: SortBy) => {
-                set({ sortBy: key });
-                get().fetchAll(key, get().sortOrder);
-            },
-            setSortOrder: (key: SortOrder) => {
-                set({ sortOrder: key });
-                get().fetchAll(get().sortBy, key);
-            },
-            clearStore: () => set(initialState)
-
-        })
-    )
+                addToast({title: response.data.message, color: "success"});
+                return response.data;
+            } catch (error) {
+                const axiosError = handleAxiosError(error);
+                set({isLoading: false, error: axiosError});
+                addToast({title: axiosError.message, color: "danger"});
+                throw axiosError;
+            }
+        },
+        setSort: (sortBy: SortBy, sortOrder: SortOrder): void => {
+            set((state) => ({
+                sortBy,
+                sortOrder,
+                pageInfo: {...state.pageInfo, number: 0},
+                memes: [],
+            }));
+            const pageable = new PageableBuilder({
+                page: 0,
+                size: get().pageInfo.size,
+                sort: {by: sortBy, order: sortOrder},
+            });
+            get().fetchAll(pageable);
+        },
+        getPageableBuilder: (
+            page = get().pageInfo.number,
+            size = get().pageInfo.size || DEFAULT_PAGE_SIZE,
+            sortByOverride,
+            sortOrderOverride
+        ) => {
+            return new PageableBuilder({
+                page,
+                size,
+                sort: {
+                    by: sortByOverride || get().sortBy,
+                    order: sortOrderOverride || get().sortOrder,
+                },
+            });
+        },
+        clearStore: () => set(initialState),
+    }))
 );

@@ -1,31 +1,62 @@
-import { useMemeStore } from "@/features/hooks/useMemeStore.ts";
+import {useCallback} from "react";
+import {useMemeStore} from "@/features/hooks/useMemeStore";
+import {DEFAULT_PAGE_SIZE} from "@/utils/PageableBuilder.ts";
+import {SortBy, SortOrder} from "@/types/pageable.ts";
 
 export const useMemeData = () => {
-    const memes = useMemeStore((state) => state.memes);
-    const meme = useMemeStore((state) => state.meme);
-    const fetchAll = useMemeStore((state) => state.fetchAll);
-    const patchOne = useMemeStore((state) => state.patchOne);
-    const isLoading = useMemeStore((state) => state.isLoading);
-    const error = useMemeStore((state) => state.error);
-    const setSort = useMemeStore((state) => state.setSortBy);
-    const setSortOrder = useMemeStore((state) => state.setSortOrder);
-    const sortByKey = useMemeStore((state) => state.sortBy);
-    const sortOrder = useMemeStore((state) => state.sortOrder);
-    const setMeme = useMemeStore((state) => state.setMeme);
-    const isCached = useMemeStore((state) => state.isCached);
-
-    return {
-        memes,
+    const {
         meme,
-        fetchAll,
-        patchOne,
+        memes,
+        sortBy,
+        sortOrder,
+        pageInfo,
+        hasMore,
         isLoading,
         error,
-        setSort,
-        setSortOrder,
-        sortByKey,
-        sortOrder,
         setMeme,
-        isCached
+        fetchAll,
+        patchOne,
+        setSort,
+        clearStore,
+        getPageableBuilder,
+    } = useMemeStore();
+
+    const isCached = useCallback(() => memes.length > 0, [memes]);
+
+    const loadPage = useCallback(async (
+        page = 0,
+        size = DEFAULT_PAGE_SIZE,
+        sortBy = SortBy.ID,
+        order = SortOrder.ASC
+    ) => {
+        const pageableBuilder = getPageableBuilder(page, size, sortBy, order);
+
+        await fetchAll(pageableBuilder);
+    }, [fetchAll, getPageableBuilder]);
+
+    const loadNextPage = useCallback(async () => {
+        if (isLoading || !hasMore) return;
+        const nextPage = pageInfo.number + 1;
+        await loadPage(nextPage, pageInfo.size || DEFAULT_PAGE_SIZE);
+    }, [isLoading, hasMore, pageInfo, loadPage]);
+
+    return {
+        meme,
+        memes,
+        sortBy,
+        sortOrder,
+        pageInfo,
+        hasMore,
+        isLoading,
+        error,
+        isCached,
+        setMeme,
+        fetchAll,
+        patchOne,
+        loadNextPage,
+        setSort,
+        clearStore,
+        getPageableBuilder,
+        loadPage,
     };
 };

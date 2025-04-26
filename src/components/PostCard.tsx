@@ -1,41 +1,41 @@
-import { memo, ReactElement, useCallback } from "react";
-import { Button, Card, Image } from "@heroui/react";
+import {memo, ReactElement, useCallback} from "react";
+import {Button, Card, Image, Link} from "@heroui/react";
 import PostActionButton from "@/components/PostActionButton.tsx";
-import { Link } from "@heroui/link";
-import clsx from "clsx";
-import { Meme } from "@/types/meme.ts";
+import {Meme} from "@/types/meme.ts";
 
-type PostCardProps = {
+interface PostCardProps {
     data: Meme;
 };
 
-const ImageWithLoader = ({ src, alt }: { src: string; alt: string }) => {
+const ImageWithLoader = memo(({src, alt}: { src: string; alt: string }) => {
     return (
         <Image
             alt={alt}
             src={src}
             isBlurred={true}
-            className={clsx("w-full")}
-            classNames={{ wrapper: "!max-w-none" }}
+            className={"w-full"}
+            classNames={{wrapper: "!max-w-none"}}
         />
     );
-};
+});
 
-const ViewSourceButton = ({ href }: { href: string }) => (
+ImageWithLoader.displayName = "ImageWithLoader";
+
+const ViewSourceButton = ({href}: { href: string }) => (
     <Button
         as={Link}
-        size="sm"
-        target="_blank"
-        rel="noopener noreferrer"
-        showAnchorIcon
+        size={"sm"}
         href={href}
-        className="rounded-[10px] bg-content3 text-sm data-[hover=true]:bg-default"
+        target={"_blank"}
+        showAnchorIcon={true}
+        rel="noopener noreferrer"
+        className={"rounded-[10px] bg-content3 text-sm data-[hover=true]:bg-default"}
     >
         View Source
     </Button>
 );
 
-const PostCard = memo(({ data }: PostCardProps): ReactElement => {
+const PostCard = memo(({data}: PostCardProps): ReactElement => {
     const handleLike = useCallback((liked: boolean) => {
         console.log("Liked:", liked, "Meme ID:", data.id);
     }, [data.id]);
@@ -45,9 +45,9 @@ const PostCard = memo(({ data }: PostCardProps): ReactElement => {
             radius={"lg"}
             fullWidth={true}
             title={data.name}
-            className={"mb-4 break-inside-avoid rounded-2xl"}
+            className={"break-inside-avoid rounded-2xl"}
         >
-            <ImageWithLoader src={data.imageUrl} alt={data.name} />
+            <ImageWithLoader src={data.imageUrl} alt={data.name}/>
 
             <div className={"flex flex-col gap-1 p-2"}>
                 <p className={"line-clamp-2"}>{data.name}</p>
@@ -59,7 +59,7 @@ const PostCard = memo(({ data }: PostCardProps): ReactElement => {
                         togglesFill={true}
                         onClickAction={handleLike}
                     />
-                    <ViewSourceButton href={data.imageUrl} />
+                    <ViewSourceButton href={data.imageUrl}/>
                 </div>
             </div>
         </Card>

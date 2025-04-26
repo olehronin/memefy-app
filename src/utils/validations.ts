@@ -1,7 +1,7 @@
 const urlPattern = /^(https?:\/\/)?([\w.-]+\.[a-z]{2,})(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(#[a-z\d_-]*)?$/i;
 
 export const isValidImageUrl = (urlString: string): boolean => {
-    return urlPattern.test(urlString) && /\.(jpg|jpeg)(\?.*)?$/i.test(urlString);
+    return urlPattern.test(urlString) && /\.(jpg|jpeg|gif|png)(\?.*)?$/i.test(urlString);
 };
 
 export const checkImageExists = async (url: string): Promise<boolean> => {
