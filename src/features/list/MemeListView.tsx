@@ -35,6 +35,10 @@ const MemeListView = memo(({
                                loadMore,
                                hasMore
                            }: MemeListViewProps): ReactElement => {
+    if (!memes.length && isLoading) {
+        return <SpinnerLoader/>
+    }
+
     if (!memes.length && !isLoading) {
         return <div className={"text-center p-4"}>No memes available</div>;
     }
